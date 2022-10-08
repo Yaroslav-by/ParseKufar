@@ -1,7 +1,9 @@
 package parsing;
 
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -18,7 +20,7 @@ public class ParseKufar {
 
 	public static void main(String[] args) {
 		
-		getLinks("https://www.kufar.by/l/r~grodnenskaya-obl/velosipedy?query=%D0%B2%D0%B5%D0%BB%D0%BE%D1%81%D0%B8%D0%BF%D0%B5%D0%B4&sort=prc.a");
+		getLinks("https://www.kufar.by/l/r~vitebskaya-obl/velotovary?query=%D0%B2%D0%B5%D0%BB%D0%BE%D1%81%D0%B8%D0%BF%D0%B5%D0%B4&sort=lst.d");
 
 	}
 	
@@ -65,14 +67,24 @@ public class ParseKufar {
 				links[i] = webDriver.getCurrentUrl();
 				pages = webDriver.findElements(By.className("styles_link__KajLs"));
 				WebElement nextPage = pages.get(pages.size() - 1);
+				System.out.println("Current page is " + n++);
+				System.out.println(webDriver.getCurrentUrl());
+				System.out.println("Next page!");
+				System.out.println();
 				nextPage.click();
-				System.out.println("Current page is " + n++ + ". Next page!");
 				try {
-					Thread.sleep(2000);
+					Thread.sleep(1000);
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
 			}
+			
+			webDriver.get(links[4]);
+			pages = webDriver.findElements(By.className("styles_link__KajLs"));
+			WebElement nextPage = pages.get(pages.size() - 1);
+			nextPage.click();
+			links[links.length - 1] = webDriver.getCurrentUrl();
+			
 			
 			int k = 1;
 			for (String i : links) {
@@ -83,10 +95,7 @@ public class ParseKufar {
 			String[] links = new String[1];
 			links[0] = webDriver.getCurrentUrl();
 		}
-
-		
-		
-		
+	
 	}
 
 }
