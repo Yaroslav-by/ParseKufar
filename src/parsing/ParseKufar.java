@@ -20,11 +20,14 @@ public class ParseKufar {
 
 	public static void main(String[] args) {
 		
-		getLinks("https://www.kufar.by/l/r~vitebskaya-obl/velotovary?query=%D0%B2%D0%B5%D0%BB%D0%BE%D1%81%D0%B8%D0%BF%D0%B5%D0%B4&sort=lst.d");
-
+		ParseKufar parseKufar = new ParseKufar();
+		//String[] links = parseKufar.getLinks("https://www.kufar.by/l/r~orsha/lyustry?sort=lst.d");
+		String[] test = {"https://www.kufar.by/l?query=%D0%BA%D0%BE%D1%80%D0%BE%D0%B2%D0%B0&sort=lst.d"};
+		parseKufar.getGoods(test);
+		
 	}
 	
-	public static void getLinks(String URL) {
+	public String[] getLinks(String URL) {
 		
 		System.setProperty("webdriver.chrome.driver", "selenium\\chromedriver.exe");
 		WebDriver webDriver = new ChromeDriver();
@@ -62,15 +65,15 @@ public class ParseKufar {
 			System.out.println("There are " + lastPage + " pages");
 			String[] links = new String[lastPage];
 			
-			int n = 1;
+//			int n = 1;
 			for (int i = 0; i < lastPage; i++) {
 				links[i] = webDriver.getCurrentUrl();
 				pages = webDriver.findElements(By.className("styles_link__KajLs"));
 				WebElement nextPage = pages.get(pages.size() - 1);
-				System.out.println("Current page is " + n++);
-				System.out.println(webDriver.getCurrentUrl());
-				System.out.println("Next page!");
-				System.out.println();
+//				System.out.println("Current page is " + n++);
+//				System.out.println(webDriver.getCurrentUrl());
+//				System.out.println("Next page!");
+//				System.out.println();
 				nextPage.click();
 				try {
 					Thread.sleep(1000);
@@ -79,23 +82,53 @@ public class ParseKufar {
 				}
 			}
 			
-			webDriver.get(links[4]);
-			pages = webDriver.findElements(By.className("styles_link__KajLs"));
-			WebElement nextPage = pages.get(pages.size() - 1);
-			nextPage.click();
-			links[links.length - 1] = webDriver.getCurrentUrl();
-			
-			
-			int k = 1;
-			for (String i : links) {
-				System.out.println(k++ + " " + i);
+//			Этот костыль для получения URL 6 страницы, т.к. при пролистывании она пропускается
+			if (lastPage > 6) {
+				webDriver.get(links[4]);
+				pages = webDriver.findElements(By.className("styles_link__KajLs"));
+				WebElement nextPage = pages.get(pages.size() - 1);
+				nextPage.click();
+				links[links.length - 1] = webDriver.getCurrentUrl();
 			}
 			
-		} catch (NullPointerException e) { //Только 1 страница с товарами
+			return links;
+
+//			int k = 1;
+//			for (String i : links) {
+//				System.out.println(k++);
+//				System.out.println(i);
+//			}
+			
+		} catch (IndexOutOfBoundsException e) { //Только 1 страница с товарами
 			String[] links = new String[1];
 			links[0] = webDriver.getCurrentUrl();
+			return links;
 		}
 	
 	}
 
+	public void getGoods(String[] links) {
+		
+		Set<String> linksToGoods = new HashSet<String>(); //Хранение ссылок на товары
+		Document document; 
+		Elements goods;
+		
+		for (int i = 0; i < links.length; i++) {
+			try {
+				document = Jsoup.connect(links[i]).get();
+				goods = document.select("a.styles_wrapper__pb4qU");
+				System.out.println(goods.size());
+				int k = 1;
+				for (Element product : goods) {
+					System.out.println(k++ + " " + product.attr("href"));
+					linksToGoods.add(product.attr("href"));
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			
+		}
+	
+	}
+	
 }
