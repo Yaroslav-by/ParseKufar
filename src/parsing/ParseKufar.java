@@ -1,6 +1,8 @@
 package parsing;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -21,9 +23,11 @@ public class ParseKufar {
 	public static void main(String[] args) {
 		
 		ParseKufar parseKufar = new ParseKufar();
-		//String[] links = parseKufar.getLinks("https://www.kufar.by/l/r~orsha/lyustry?sort=lst.d");
-		String[] test = {"https://www.kufar.by/l?query=%D0%BA%D0%BE%D1%80%D0%BE%D0%B2%D0%B0&sort=lst.d"};
-		parseKufar.getGoods(test);
+		String[] links = parseKufar.getLinks("https://www.kufar.by/l/r~pinsk/velotovary?query=%D0%B2%D0%B5%D0%BB%D0%BE%D1%81%D0%B8%D0%BF%D0%B5%D0%B4&sort=lst.d");
+		HashSet<String> linksToGoods = parseKufar.getGoods(links);
+//		HashSet<String> testLinks = new HashSet<String>();
+//		testLinks.add("https://www.kufar.by/item/171343513");
+		parseKufar.getInfoFromGoods(linksToGoods);
 		
 	}
 	
@@ -35,13 +39,13 @@ public class ParseKufar {
 		
 		WebElement popupWindows;
 		try {
-			//РќР°Р¶РёРјР°РµРј РЅР° РїСЂРёРЅСЏС‚РёРµ cookie
+			//Нажимаем на принятие cookie
 			popupWindows = webDriver.findElement(By.xpath("//*[@id=\"__next\"]/div[3]/div/div[2]/button"));
 			popupWindows.click();
-			//Р—Р°РєСЂС‹РІР°РµРј СЂРµРєР»Р°РјСѓ
+			//Закрываем рекламу
 			popupWindows = webDriver.findElement(By.xpath("//*[@id=\"portal\"]/div/div[2]/div[1]/div/button"));
 			popupWindows.click();
-		} catch (NoSuchElementException e) { //Р­Р»РµРјРµРЅС‚ СЂРµРєР»Р°РјС‹ РЅРµ СѓСЃРїРµР» Р·Р°РіСЂСѓР·РёС‚СЊСЃСЏ, Р¶РґРµРј
+		} catch (NoSuchElementException e) { //Элемент рекламы не успел загрузиться, ждем
 			try {
 				System.out.println("No such element and you have to wait!");
 				Thread.sleep(500);
@@ -51,7 +55,7 @@ public class ParseKufar {
 			} catch (InterruptedException e1) {
 				e1.printStackTrace();
 			}
-		} catch (ElementNotInteractableException e) { //РќРµСѓРґР°С‡Р° РїСЂРё РїРµСЂРІРѕР№ РїРѕРїС‹С‚РєРµ Р·Р°РєСЂС‹С‚СЊ СЂРµРєР»Р°РјСѓ
+		} catch (ElementNotInteractableException e) { //Неудача при первой попытке закрыть рекламу
 			System.out.println("One more try to click!");
 			popupWindows = webDriver.findElement(By.xpath("//*[@id=\"portal\"]/div/div[2]/div[1]/div/img"));
 			popupWindows.click();
@@ -59,7 +63,7 @@ public class ParseKufar {
 		}
 		
 		try {
-			//РџРѕРёСЃРє РєРѕР»РёС‡РµСЃС‚РІР° СЃС‚СЂР°РЅРёС† Рё СЃРѕР·РґР°РЅРёРµ РјР°СЃСЃРёРІР° РґР»СЏ РёС… С…СЂР°РЅРµРЅРёСЏ
+			//Поиск количества страниц и создание массива для их хранения
 			List<WebElement> pages = webDriver.findElements(By.className("styles_link__KajLs"));
 			int lastPage = Integer.parseInt(pages.get(pages.size() - 2).getText());
 			System.out.println("There are " + lastPage + " pages");
@@ -82,7 +86,7 @@ public class ParseKufar {
 				}
 			}
 			
-//			Р­С‚РѕС‚ РєРѕСЃС‚С‹Р»СЊ РґР»СЏ РїРѕР»СѓС‡РµРЅРёСЏ URL 6 СЃС‚СЂР°РЅРёС†С‹, С‚.Рє. РїСЂРё РїСЂРѕР»РёСЃС‚С‹РІР°РЅРёРё РѕРЅР° РїСЂРѕРїСѓСЃРєР°РµС‚СЃСЏ
+//			Этот костыль для получения URL 6 страницы, т.к. при пролистывании она пропускается
 			if (lastPage > 6) {
 				webDriver.get(links[4]);
 				pages = webDriver.findElements(By.className("styles_link__KajLs"));
@@ -99,7 +103,7 @@ public class ParseKufar {
 //				System.out.println(i);
 //			}
 			
-		} catch (IndexOutOfBoundsException e) { //РўРѕР»СЊРєРѕ 1 СЃС‚СЂР°РЅРёС†Р° СЃ С‚РѕРІР°СЂР°РјРё
+		} catch (IndexOutOfBoundsException e) { //Только 1 страница с товарами
 			String[] links = new String[1];
 			links[0] = webDriver.getCurrentUrl();
 			return links;
@@ -107,9 +111,9 @@ public class ParseKufar {
 	
 	}
 
-	public void getGoods(String[] links) {
+	public HashSet<String> getGoods(String[] links) {
 		
-		Set<String> linksToGoods = new HashSet<String>(); //РҐСЂР°РЅРµРЅРёРµ СЃСЃС‹Р»РѕРє РЅР° С‚РѕРІР°СЂС‹
+		Set<String> linksToGoods = new HashSet<String>(); //Хранение ссылок на товары
 		Document document; 
 		Elements goods;
 		
@@ -117,18 +121,69 @@ public class ParseKufar {
 			try {
 				document = Jsoup.connect(links[i]).get();
 				goods = document.select("a.styles_wrapper__pb4qU");
-				System.out.println(goods.size());
-				int k = 1;
 				for (Element product : goods) {
-					System.out.println(k++ + " " + product.attr("href"));
 					linksToGoods.add(product.attr("href"));
 				}
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-			
 		}
+		
+		System.out.println("There are " + linksToGoods.size() + " goods.");
+		return (HashSet<String>) linksToGoods;
+		
+//		int k = 1;
+//		for (String i : linksToGoods) {
+//			System.out.println(k++ + " " + i);
+//		}
 	
+	}
+	
+	public void getInfoFromGoods(HashSet<String> linksToGoods) {
+		
+		List<HashMap<String, String>> information = new ArrayList<HashMap<String, String>>();
+		Document document;
+		
+		for (int i = 0; i < linksToGoods.size(); i++) {
+			
+			HashMap<String, String> tempHashMap = new HashMap<String,String>();
+			try {
+				document = Jsoup.connect((String) linksToGoods.toArray()[i]).get();
+				Element element;
+				
+				//Берем со страницы имя товара
+				element = document.selectFirst("h1.styles_brief_wrapper__title__x59rm");
+				tempHashMap.put("itemName", element.text());
+				
+				//Берем со страницы цену товара
+				element = document.selectFirst("span.styles_main__PU1v4");
+				tempHashMap.put("itemPrice", element.text());
+				
+				//Берем имя продавца товара
+				element = document.selectFirst("div.styles_seller-block__top-right-name__imyGc");
+				tempHashMap.put("sellerName", element.text());
+				
+				//Берем город продажи
+				element = document.selectFirst("span.styles_address__fQyGA");
+				tempHashMap.put("sellerCity", element.text());
+				
+				//Берем ссылку на товар
+				tempHashMap.put("itemLink", (String) linksToGoods.toArray()[i]);
+				
+				
+				information.add(tempHashMap);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+				
+		}
+		
+		int k = 1;
+		for (HashMap<String, String> i : information) {
+			System.out.println(k++ + " " + i);
+		}
+		
+		
 	}
 	
 }
