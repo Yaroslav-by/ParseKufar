@@ -54,6 +54,8 @@ public class ParseKufar {
 				System.out.println("Sucsess!");
 			} catch (InterruptedException e1) {
 				e1.printStackTrace();
+			} catch (NoSuchElementException e1) { //Рекламу убрали с сайта
+				System.out.println("Oops, the ad is not found!");
 			}
 		} catch (ElementNotInteractableException e) { //Неудача при первой попытке закрыть рекламу
 			System.out.println("One more try to click!");
@@ -66,9 +68,9 @@ public class ParseKufar {
 			//Поиск количества страниц и создание массива для их хранения
 			List<WebElement> pages = webDriver.findElements(By.className("styles_link__KajLs"));
 			int lastPage = Integer.parseInt(pages.get(pages.size() - 2).getText());
-			System.out.println("There are " + lastPage + " pages");
 			String[] links = new String[lastPage];
 			
+			System.out.println("There are " + lastPage + " pages. Starting to get links.");
 //			int n = 1;
 			for (int i = 0; i < lastPage; i++) {
 				links[i] = webDriver.getCurrentUrl();
@@ -95,6 +97,7 @@ public class ParseKufar {
 				links[links.length - 1] = webDriver.getCurrentUrl();
 			}
 			
+			System.out.println("Links added.");
 			return links;
 
 //			int k = 1;
@@ -106,6 +109,7 @@ public class ParseKufar {
 		} catch (IndexOutOfBoundsException e) { //Только 1 страница с товарами
 			String[] links = new String[1];
 			links[0] = webDriver.getCurrentUrl();
+			System.out.println("Links added.");
 			return links;
 		}
 	
@@ -117,6 +121,7 @@ public class ParseKufar {
 		Document document; 
 		Elements goods;
 		
+		System.out.println("Starting to get goods.");
 		for (int i = 0; i < links.length; i++) {
 			try {
 				document = Jsoup.connect(links[i]).get();
@@ -129,7 +134,7 @@ public class ParseKufar {
 			}
 		}
 		
-		System.out.println("There are " + linksToGoods.size() + " goods.");
+		System.out.println("Finish. There are " + linksToGoods.size() + " goods.");
 		return (HashSet<String>) linksToGoods;
 		
 //		int k = 1;
@@ -144,6 +149,7 @@ public class ParseKufar {
 		List<HashMap<String, String>> information = new ArrayList<HashMap<String, String>>();
 		Document document;
 		
+		System.out.println("Starting to get info from goods.");
 		for (int i = 0; i < linksToGoods.size(); i++) {
 			
 			HashMap<String, String> tempHashMap = new HashMap<String,String>();
@@ -177,12 +183,12 @@ public class ParseKufar {
 			}
 				
 		}
+		System.out.println("Finish.");
 		
 		int k = 1;
 		for (HashMap<String, String> i : information) {
 			System.out.println(k++ + " " + i);
 		}
-		
 		
 	}
 	
