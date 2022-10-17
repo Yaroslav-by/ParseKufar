@@ -98,6 +98,7 @@ public class ParseKufar {
 			}
 			
 			System.out.println("Links added.");
+			webDriver.quit();
 			return links;
 
 //			int k = 1;
@@ -110,6 +111,7 @@ public class ParseKufar {
 			String[] links = new String[1];
 			links[0] = webDriver.getCurrentUrl();
 			System.out.println("Links added.");
+			webDriver.quit();
 			return links;
 		}
 	
@@ -144,7 +146,7 @@ public class ParseKufar {
 	
 	}
 	
-	public void getInfoFromGoods(HashSet<String> linksToGoods) {
+	public ArrayList<HashMap<String, String>> getInfoFromGoods(HashSet<String> linksToGoods) {
 		
 		List<HashMap<String, String>> information = new ArrayList<HashMap<String, String>>();
 		Document document;
@@ -184,11 +186,12 @@ public class ParseKufar {
 				
 		}
 		System.out.println("Finish.");
+		return (ArrayList<HashMap<String, String>>) information;
 		
-		int k = 1;
-		for (HashMap<String, String> i : information) {
-			System.out.println(k++ + " " + i);
-		}
+//		int k = 1;
+//		for (HashMap<String, String> i : information) {
+//			System.out.println(k++ + " " + i);
+//		}
 		
 	}
 	
