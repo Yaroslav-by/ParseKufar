@@ -28,7 +28,6 @@ import javax.swing.table.DefaultTableModel;
 
 import parsing.ParseKufar;
 
-import javax.swing.ListSelectionModel;
 import java.awt.Component;
 
 public class GUIParsing extends JFrame {
@@ -115,68 +114,71 @@ public class GUIParsing extends JFrame {
 		      tableModel.addColumn("Ссылка");
 		      
 		      String request = requestTextField.getText();
-		      String requestLink = null;
-		      if (categoryComboBox.getSelectedItem().equals("Не выбрано")  && locationComboBox.getSelectedItem().equals("Вся Беларусь")) {
-		    	  requestLink = "https://www.kufar.by/l?query=" + request + "&rgn=all&utm_queryOrigin=Manually_typed";
-		      } else if (categoryComboBox.getSelectedItem().equals("Не выбрано") && !locationComboBox.getSelectedItem().equals("Вся Беларусь")) {
-		    	  switch ((String) locationComboBox.getSelectedItem()) {
-		    	      case ("Минск"): requestLink = "https://www.kufar.by/l/r~minsk?query=" + request + "&rgn=all&utm_queryOrigin=Manually_typed";
-		    	  break;
-		    	      case ("Брестская обл."): requestLink = "https://www.kufar.by/l/r~brestskaya-obl?query=" + request + "&rgn=all&utm_queryOrigin=Manually_typed";
-		    	  break;
-		    	      case ("Витебская обл."): requestLink = "https://www.kufar.by/l/r~vitebskaya-obl?query=" + request + "&rgn=all&utm_queryOrigin=Manually_typed";
-		    	  break;
-		    	      case ("Гомельская обл."): requestLink = "https://www.kufar.by/l/r~gomelskaya-obl?query=" + request + "&rgn=all&utm_queryOrigin=Manually_typed";
-		    	  break;
-		    	      case ("Гродненская обл."): requestLink = "https://www.kufar.by/l/r~grodnenskaya-obl?query=" + request + "&rgn=all&utm_queryOrigin=Manually_typed";
-		    	  break;
-		    	      case ("Могилевская обл."): requestLink = "https://www.kufar.by/l/r~mogilevskaya-obl?query=" + request + "&rgn=all&utm_queryOrigin=Manually_typed";
-		    	  break;
-		    	      case ("Минская обл."): requestLink = "https://www.kufar.by/l/r~minskaya-obl?query=" + request + "&rgn=all&utm_queryOrigin=Manually_typed";
-		    	  break;
-		    	  }
-		      } else if (!categoryComboBox.getSelectedItem().equals("Не выбрано") && locationComboBox.getSelectedItem().equals("Вся Беларусь")) {
+		      String requestLink = "?query=" + request;	      
+		      
+		      if (!categoryComboBox.getSelectedItem().equals("Не выбрано")) {
 		    	  switch ((String) categoryComboBox.getSelectedItem()) {
-		    	      case ("Бытовая техника"): requestLink = "https://www.kufar.by/l/bytovaya-tehnika?query=" + request;
+		    	      case ("Бытовая техника"): requestLink = "bytovaya-tehnika" + requestLink;
 		    	  break;
-		    	      case ("Компьютерная техника"): requestLink = "https://www.kufar.by/l/kompyuternaya-tehnika?query=" + request;
+		    	      case ("Компьютерная техника"): requestLink = "kompyuternaya-tehnika" + requestLink;
 		    	  break;
-		    	      case ("Телефоны и планшеты"): requestLink = "https://www.kufar.by/l/telefony-i-planshety?query=" + request;
+		    	      case ("Телефоны и планшеты"): requestLink = "telefony-i-planshety" + requestLink;
 		    	  break;
-		    	      case ("Электроника"): requestLink = "https://www.kufar.by/l/elektronika?query=" + request;
+		    	      case ("Электроника"): requestLink = "elektronika" + requestLink;
 		    	  break;
-		    	      case ("Женский гардероб"): requestLink = "https://www.kufar.by/l/zhenskij-garderob?query=" + request;
+		    	      case ("Женский гардероб"): requestLink = "zhenskij-garderob" + requestLink;
 		    	  break;
-		    	      case ("Мужской гардероб"): requestLink = "https://www.kufar.by/l/muzhskoj-garderob?query=" + request;
+		    	      case ("Мужской гардероб"): requestLink = "muzhskoj-garderob" + requestLink;
 		    	  break;
-		    	      case ("Красота и здоровье"): requestLink = "https://www.kufar.by/l/krasota-i-zdorovie?query=" + request;
+		    	      case ("Красота и здоровье"): requestLink = "krasota-i-zdorovie" + requestLink;
 		    	  break;
-		    	      case ("Всё для детей и мам"): requestLink = "https://www.kufar.by/l/vse-dlya-detej-i-mam?query=" + request;
+		    	      case ("Всё для детей и мам"): requestLink = "vse-dlya-detej-i-mam" + requestLink;
 		    	  break;
-		    	      case ("Мебель"): requestLink = "https://www.kufar.by/l/mebel?query=" + request;
+		    	      case ("Мебель"): requestLink = "mebel" + requestLink;
 		    	  break;
-		    	      case ("Все для дома"): requestLink = "https://www.kufar.by/l/vse-dlya-doma?query=" + request;
+		    	      case ("Все для дома"): requestLink = "vse-dlya-doma" + requestLink;
 		    	  break;
-		    	      case ("Ремонт и стройка"): requestLink = "https://www.kufar.by/l/remont-i-strojka?query=" + request;
+		    	      case ("Ремонт и стройка"): requestLink = "remont-i-strojka" + requestLink;
 		    	  break;
-		    	      case ("Сад и огород"): requestLink = "https://www.kufar.by/l/sad-i-ogorod?query=" + request;
+		    	      case ("Сад и огород"): requestLink = "sad-i-ogorod" + requestLink;
 		    	  break;
-		    	      case ("Хобби, спорт и туризм"): requestLink = "https://www.kufar.by/l/hobbi-sport-i-turizm?query=" + request;
+		    	      case ("Хобби, спорт и туризм"): requestLink = "hobbi-sport-i-turizm" + requestLink;
 		    	  break;
-		    	      case ("Свадьба и праздники"): requestLink = "https://www.kufar.by/l/svadba-i-prazdniki?query=" + request;
+		    	      case ("Свадьба и праздники"): requestLink = "svadba-i-prazdniki" + requestLink;
 		    	  break;
-		    	      case ("Животные"): requestLink = "https://www.kufar.by/l/zhivotnye?query=" + request;
+		    	      case ("Животные"): requestLink = "zhivotnye" + requestLink;
 		    	  break;
-		    	      case ("Готовый бизнес и оборудование"): requestLink = "https://www.kufar.by/l/gotovyj-biznes-i-oborudovanie?query=" + request;
+		    	      case ("Готовый бизнес и оборудование"): requestLink = "gotovyj-biznes-i-oborudovanie" + requestLink;
 		    	  break;
-		    	      case ("Работа"): requestLink = "https://www.kufar.by/l/rabota-biznes-uchjoba?query=" + request;
+		    	      case ("Работа"): requestLink = "rabota-biznes-uchjoba" + requestLink;
 		    	  break;
-		    	      case ("Услуги"): requestLink = "https://www.kufar.by/l/uslugi?query=" + request;
+		    	      case ("Услуги"): requestLink = "uslugi" + requestLink;
 		    	  break;
-		    	      case ("Прочее"): requestLink = "https://www.kufar.by/l/prochee?query=" + request;
+		    	      case ("Прочее"): requestLink = "prochee" + requestLink;
 		    	  break;
 		    	  }
 		      }
+		      
+		      if (!locationComboBox.getSelectedItem().equals("Вся Беларусь")) {
+		    	  switch ((String) locationComboBox.getSelectedItem()) {
+		    	      case ("Минск"): requestLink = "r~minsk/" + requestLink;
+		    	  break;
+		    	      case ("Брестская обл."): requestLink = "r~brestskaya-obl/" + requestLink;
+		    	  break;
+		    	      case ("Витебская обл."): requestLink = "r~vitebskaya-obl/" + requestLink;
+		    	  break;
+		    	      case ("Гомельская обл."): requestLink = "r~gomelskaya-obl/" + requestLink;
+		    	  break;
+		    	      case ("Гродненская обл."): requestLink = "r~grodnenskaya-obl/" + requestLink;
+		    	  break;
+		    	      case ("Могилевская обл."): requestLink = "r~mogilevskaya-obl/" + requestLink;
+		    	  break;
+		    	      case ("Минская обл."): requestLink = "r~minskaya-obl/" + requestLink;
+		    	  break;
+		    	  }
+		      }
+		      
+		      requestLink = "https://www.kufar.by/l/" + requestLink;
 		      
 		      ParseKufar parseKufar = new ParseKufar();
 		      String[] links = parseKufar.getLinks(requestLink);
@@ -237,45 +239,6 @@ public class GUIParsing extends JFrame {
 		Component rigidArea = Box.createRigidArea(new Dimension(10, 10));
 		emptyPanelBottom.add(rigidArea);
 		
-//		table = new JTable();
-//		table.setModel(new DefaultTableModel(
-//			new Object[][] {
-//				{1000, "1", "1", "1", "1", "1"},
-//			},
-//			new String[] {
-//				"id", "\u0418\u043C\u044F \u0442\u043E\u0432\u0430\u0440\u0430", "\u0426\u0435\u043D\u0430", "\u041C\u0435\u0441\u0442\u043E \u043F\u0440\u043E\u0434\u0430\u0436\u0438", "\u041F\u0440\u043E\u0434\u0430\u0432\u0435\u0446", "\u0421\u0441\u044B\u043B\u043A\u0430"
-//			}
-//		) {
-//			boolean[] columnEditables = new boolean[] {
-//				false, false, false, false, false, false
-//			};
-//			public boolean isCellEditable(int row, int column) {
-//				return columnEditables[column];
-//			}
-//		});
-//		table.getColumnModel().getColumn(0).setPreferredWidth(35);
-//		table.getColumnModel().getColumn(0).setMinWidth(25);
-//		table.getColumnModel().getColumn(0).setMaxWidth(50);
-//		table.getColumnModel().getColumn(1).setPreferredWidth(600);
-//		table.getColumnModel().getColumn(1).setMinWidth(300);
-//		table.getColumnModel().getColumn(1).setMaxWidth(800);
-//		table.getColumnModel().getColumn(2).setPreferredWidth(70);
-//		table.getColumnModel().getColumn(2).setMinWidth(50);
-//		table.getColumnModel().getColumn(2).setMaxWidth(100);
-//		table.getColumnModel().getColumn(3).setPreferredWidth(200);
-//		table.getColumnModel().getColumn(3).setMinWidth(100);
-//		table.getColumnModel().getColumn(3).setMaxWidth(400);
-//		table.getColumnModel().getColumn(4).setPreferredWidth(150);
-//		table.getColumnModel().getColumn(4).setMinWidth(80);
-//		table.getColumnModel().getColumn(4).setMaxWidth(200);
-//		table.getColumnModel().getColumn(5).setMinWidth(50);
-//		table.getColumnModel().getColumn(5).setMaxWidth(150);
-//		table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-//		table.setFont(new Font("Times New Roman", Font.PLAIN, 16));
-//		table.setBorder(new LineBorder(new Color(0, 0, 0), 1, true));
-//
-//		JScrollPane scrollPane = new JScrollPane(table);
-//		centralPanel.add(scrollPane);
 	}
 
 }
